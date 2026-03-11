@@ -83,18 +83,21 @@ function getDifficulty(day) {
 }
 // new daily puzzle generator
 export function generateDailyPuzzle() {
+    const seed = getseedFromDate();
     const day = getDayofYear();
     const difficulty = getDifficulty(day);
-    const puzzleTypes =  day % 4;
+    const puzzleTypes =  seed % 4;
     let puzzle;
 
-    if(puzzleTypes === 0) puzzle = generateSequencePuzzle(day);
-    if(puzzleTypes === 1) puzzle = generatePatternPuzzle(day);
-    if(puzzleTypes === 2) puzzle = generateMatrixPuzzle(day);
-    if(puzzleTypes === 3) puzzle = generateBinaryLogicPuzzle(day);
+    if(puzzleTypes === 0) puzzle = generateSequencePuzzle(seed);
+    if(puzzleTypes === 1) puzzle = generatePatternPuzzle(seed);
+    if(puzzleTypes === 2) puzzle = generateMatrixPuzzle(seed);
+    if(puzzleTypes === 3) puzzle = generateBinaryLogicPuzzle(seed);
 
     if(!puzzle) {
-        throw new Error("Puzzle generation failed");   }
+        throw new Error("Puzzle generation failed");
+    }
+
     puzzle.difficulty = difficulty;
     return puzzle;
 }
@@ -114,3 +117,4 @@ export function generatePuzzleBySeed(seed) {
     puzzle.difficulty = diffculty;
     return puzzle;
 }
+ 
