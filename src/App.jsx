@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const MAX_STREAK = 365;
+
 function App() {
   const [streak, setStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
@@ -7,27 +9,46 @@ function App() {
 
   // Load data from localStorage
   useEffect(() => {
-  const storedStreak = Number(localStorage.getItem("streak"));
-  const storedLongest = Number(localStorage.getItem("longestStreak"));
-  const storedSolved = Number(localStorage.getItem("puzzlesSolved"));
+    const storedStreak = Number(localStorage.getItem("streak"));
+    const storedLongest = Number(localStorage.getItem("longestStreak"));
+    const storedSolved = Number(localStorage.getItem("puzzlesSolved"));
 
-  const validStreak = isNaN(storedStreak) || storedStreak < 0 ? 0 : storedStreak;
-  const validLongest = isNaN(storedLongest) || storedLongest < 0 ? 0 : storedLongest;
-  const validSolved = isNaN(storedSolved) || storedSolved < 0 ? 0 : storedSolved;
+    const validStreak =
+      isNaN(storedStreak) || storedStreak < 0
+        ? 0
+        : Math.min(storedStreak, MAX_STREAK);
 
-  setStreak(validStreak);
-  setLongestStreak(validLongest);
-  setPuzzlesSolved(validSolved);
+    const validLongest =
+      isNaN(storedLongest) || storedLongest < 0
+        ? 0
+        : Math.min(storedLongest, MAX_STREAK);
 
-}, []);
+    const validSolved =
+      isNaN(storedSolved) || storedSolved < 0
+        ? 0
+        : storedSolved;
 
+    setStreak(validStreak);
+    setLongestStreak(validLongest);
+    setPuzzlesSolved(validSolved);
+  }, []);
 
-  // Example function to update streak
+  // Function to update streak when puzzle is solved
   const updateStreak = () => {
-    const newStreak = streak + 1;
+    let newStreak = streak + 1;
+
+    // Clamp streak to max value
+    if (newStreak > MAX_STREAK) {
+      newStreak = MAX_STREAK;
+    }
+
+    const newSolved = puzzlesSolved + 1;
 
     setStreak(newStreak);
+    setPuzzlesSolved(newSolved);
+
     localStorage.setItem("streak", newStreak);
+    localStorage.setItem("puzzlesSolved", newSolved);
 
     if (newStreak > longestStreak) {
       setLongestStreak(newStreak);
