@@ -6,12 +6,15 @@ function App() {
   const [streak, setStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
   const [puzzlesSolved, setPuzzlesSolved] = useState(0);
+  const [lastSolvedDate, setLastSolvedDate] = useState(null);
+  const [canSolveToday, setCanSolveToday] = useState(true);
 
-  // Load data from localStorage
+  // Load saved data
   useEffect(() => {
     const storedStreak = Number(localStorage.getItem("streak"));
     const storedLongest = Number(localStorage.getItem("longestStreak"));
     const storedSolved = Number(localStorage.getItem("puzzlesSolved"));
+    const storedLastDate = localStorage.getItem("lastSolvedDate");
 
     const validStreak =
       isNaN(storedStreak) || storedStreak < 0
@@ -24,20 +27,40 @@ function App() {
         : Math.min(storedLongest, MAX_STREAK);
 
     const validSolved =
-      isNaN(storedSolved) || storedSolved < 0
-        ? 0
-        : storedSolved;
+      isNaN(storedSolved) || storedSolved < 0 ? 0 : storedSolved;
 
     setStreak(validStreak);
     setLongestStreak(validLongest);
     setPuzzlesSolved(validSolved);
+    setLastSolvedDate(storedLastDate);
+
+    const today = new Date().toDateString();
+
+    if (storedLastDate === today) {
+      setCanSolveToday(false);
+    }
   }, []);
 
-  // Function to update streak when puzzle is solved
   const updateStreak = () => {
-    let newStreak = streak + 1;
+    const today = new Date().toDateString();
 
-    // Clamp streak to max value
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toDateString();
+
+    let newStreak = streak;
+
+    if (lastSolvedDate === today) {
+      alert("You already solved today's puzzle!");
+      return;
+    }
+
+    if (lastSolvedDate === yesterdayStr) {
+      newStreak = streak + 1;
+    } else {
+      newStreak = 1;
+    }
+
     if (newStreak > MAX_STREAK) {
       newStreak = MAX_STREAK;
     }
@@ -46,9 +69,12 @@ function App() {
 
     setStreak(newStreak);
     setPuzzlesSolved(newSolved);
+    setLastSolvedDate(today);
+    setCanSolveToday(false);
 
     localStorage.setItem("streak", newStreak);
     localStorage.setItem("puzzlesSolved", newSolved);
+    localStorage.setItem("lastSolvedDate", today);
 
     if (newStreak > longestStreak) {
       setLongestStreak(newStreak);
@@ -57,14 +83,18 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
       <h1>Logic Looper Dashboard</h1>
 
-      <p>🔥 Current Streak: {streak}</p>
-      <p>🏆 Longest Streak: {longestStreak}</p>
-      <p>🧩 Puzzles Solved: {puzzlesSolved}</p>
+      <h2>🔥 Current Streak: {streak}</h2>
+      <h3>🏆 Longest Streak: {longestStreak}</h3>
+      <h3>🧩 Puzzles Solved: {puzzlesSolved}</h3>
 
-      <button onClick={updateStreak}>Solve Puzzle</button>
+      {canSolveToday ? (
+        <button onClick={updateStreak}>Solve Today's Puzzle</button>
+      ) : (
+        <p>✅ You already solved today's puzzle</p>
+      )}
     </div>
   );
 }
