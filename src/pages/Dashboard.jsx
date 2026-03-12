@@ -76,26 +76,35 @@ export default function Dashboard() {
   return (
     <div>
 
-      <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
-
       {/* Start Puzzle Section */}
-      <div className="bg-gradient-to-r from-primary to-blue-600 text-white rounded-xl p-8 mb-8 flex items-center justify-between shadow-lg">
+      <div className="bg-gradient-to-r from-primary to-blue-600 text-white rounded-3xl p-10 mb-8 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between">
 
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">
-            Ready for Today’s Challenge?
+        <div className="max-w-lg">
+
+          <span className="bg-white/20 px-3 py-1 rounded-full text-xs">
+            DAILY CHALLENGE
+          </span>
+
+          <h2 className="text-3xl font-bold mt-4 mb-3">
+            The Quantum Paradox Puzzle
           </h2>
 
           <p className="text-blue-100">
-            Solve today's puzzle and maintain your streak.
+            A high-stakes logic puzzle involving quantum states
+            and temporal loops. Only 15% of players solved this today.
           </p>
+
         </div>
 
         <Link to="/puzzle">
-          <button className="flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 hover:scale-105 transition transform duration-200">
+
+          <button className="mt-6 md:mt-0 flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 hover:scale-105 transition">
+
             <FaPlay />
-            Start Puzzle
+            Start Solving
+
           </button>
+
         </Link>
 
       </div>
@@ -103,7 +112,7 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition duration-200">
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-xl transition duration-200">
 
           <div className="flex items-center gap-3 text-accent">
             <FaFire size={22} />

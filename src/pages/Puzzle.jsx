@@ -43,8 +43,6 @@ export default function Puzzle() {
   return (
     <div>
 
-      <h1 className="text-2xl font-semibold mb-6">Daily Puzzle</h1>
-
       <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
 
         <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-600 font-medium">

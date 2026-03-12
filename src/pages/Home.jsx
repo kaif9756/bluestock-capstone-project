@@ -4,24 +4,38 @@ import { FaPlay, FaBrain, FaFire } from "react-icons/fa";
 export default function Home() {
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center">
+    <div className="min-h-[85vh] flex flex-col items-center justify-center text-center px-6">
 
-      <div className="max-w-2xl">
+      {/* Hero Section */}
 
-        <h1 className="text-4xl font-bold mb-4">
-          Logic Looper
+      <div className="max-w-3xl">
+
+        <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
+
+          Master your mind,<br />
+
+          <span className="text-primary">
+            one puzzle at a time.
+          </span>
+
         </h1>
 
-        <p className="text-gray-500 mb-8">
-          Solve daily logic puzzles, maintain streaks, and challenge your mind every day.
+        <p className="text-gray-500 text-lg mb-10">
+
+          Logic Looper is the ultimate daily puzzle platform.
+          Solve challenges, maintain streaks, and climb the
+          global leaderboard.
+
         </p>
 
-        <div className="flex justify-center gap-4 mb-10">
+        {/* Buttons */}
+
+        <div className="flex justify-center gap-4 mb-12">
 
           <Link to="/login">
-            <button className="bg-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-blue-600">
+            <button className="bg-primary text-white px-8 py-4 rounded-xl flex items-center gap-2 hover:scale-105 transition shadow-lg">
               <FaPlay />
-              Start Playing
+              Get Started Free
             </button>
           </Link>
 
@@ -30,7 +44,7 @@ export default function Home() {
               localStorage.setItem("guest", "true");
               window.location.href = "/dashboard";
             }}
-            className="border border-primary text-primary px-6 py-3 rounded-lg hover:bg-primary hover:text-white"
+            className="border border-gray-300 px-8 py-4 rounded-xl hover:bg-gray-50 transition"
           >
             Continue as Guest
           </button>
@@ -39,40 +53,48 @@ export default function Home() {
 
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+      {/* Feature Cards */}
 
-        <div className="bg-white p-6 rounded-xl shadow">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 max-w-5xl w-full">
 
-          <FaBrain className="text-primary text-xl mb-2" />
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
 
-          <h3 className="font-semibold">Daily Puzzles</h3>
+          <FaBrain className="text-primary text-xl mb-3" />
+
+          <h3 className="font-semibold mb-1">
+            Daily Puzzles
+          </h3>
 
           <p className="text-sm text-gray-500">
-            New logic challenge every day.
+            A new logic challenge every day to train your brain.
           </p>
 
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
 
-          <FaFire className="text-accent text-xl mb-2" />
+          <FaFire className="text-accent text-xl mb-3" />
 
-          <h3 className="font-semibold">Streak System</h3>
+          <h3 className="font-semibold mb-1">
+            Streak System
+          </h3>
 
           <p className="text-sm text-gray-500">
-            Maintain your puzzle solving streak.
+            Maintain your solving streak and stay consistent.
           </p>
 
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
 
-          <FaPlay className="text-green-500 text-xl mb-2" />
+          <FaPlay className="text-green-500 text-xl mb-3" />
 
-          <h3 className="font-semibold">Offline Play</h3>
+          <h3 className="font-semibold mb-1">
+            Offline Play
+          </h3>
 
           <p className="text-sm text-gray-500">
-            Play puzzles even without internet.
+            Play puzzles anytime even without internet.
           </p>
 
         </div>

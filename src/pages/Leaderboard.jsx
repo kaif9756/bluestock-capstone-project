@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { FaFire } from "react-icons/fa";
+import {
+FaFire,
+FaMedal,
+FaAward,
+FaTrophy,
+FaCrown,
+FaUserCircle
+} from "react-icons/fa";
 
 export default function Leaderboard() {
 
@@ -16,11 +23,9 @@ const playersData = [
   { name: "Vikas", score: 710, solved: 37, streak: 3 },
 ];
 
-
-// 🏆 Global Ranking Logic
 const players = [...playersData].sort((a, b) => b.score - a.score);
 
-// Pagination
+// pagination
 const [page, setPage] = useState(1);
 const perPage = 5;
 
@@ -30,58 +35,98 @@ const end = start + perPage;
 const paginatedPlayers = players.slice(start, end);
 const totalPages = Math.ceil(players.length / perPage);
 
-// Top 3 players
+// top 3
 const top3 = players.slice(0, 3);
 
 return (
 
 <div>
 
-<h1 className="text-2xl font-semibold mb-8">
-Leaderboard
-</h1>
+{/* ---------------- TOP PODIUM ---------------- */}
 
-{/* 🥇 Top 3 Cards */}
+<div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-12">
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+{/* 2nd */}
 
-{top3.map((player, index) => (
+<div className="bg-white rounded-xl shadow p-6 text-center w-52 hover:shadow-lg transition">
 
-<div
-key={index}
-className={`p-6 rounded-xl shadow text-center bg-white hover:shadow-lg transition
-${player.name === currentUser ? "border-2 border-primary" : ""}
-`}
->
+<FaMedal className="text-gray-400 text-2xl mx-auto mb-2"/>
 
-<div className="text-3xl mb-2">
-{index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+<div className="text-5xl text-gray-400 mb-2">
+<FaUserCircle className="mx-auto"/>
+</div>
+
+<h3 className="font-semibold">
+{top3[1]?.name}
+</h3>
+
+<p className="text-primary font-bold">
+{top3[1]?.score}
+</p>
+
+<div className="flex justify-center items-center gap-1 text-accent mt-2">
+<FaFire/>
+{top3[1]?.streak}
+</div>
+
+</div>
+
+{/* 1st */}
+
+<div className="bg-white rounded-xl shadow-lg p-8 text-center w-56 border-2 border-primary scale-105">
+
+<div className="flex justify-center mb-2 text-yellow-500 text-xl">
+<FaCrown/>
+</div>
+
+<div className="text-6xl text-primary mb-2">
+<FaUserCircle className="mx-auto"/>
 </div>
 
 <h3 className="text-lg font-semibold">
-{player.name}
+{top3[0]?.name}
 </h3>
 
-<p className="text-primary font-bold text-xl mt-2">
-{player.score}
+<p className="text-primary text-xl font-bold">
+{top3[0]?.score}
 </p>
 
-<p className="text-sm text-gray-500 mt-1">
-{player.solved} puzzles solved
+<div className="flex justify-center items-center gap-1 text-accent mt-2">
+<FaFire/>
+{top3[0]?.streak}
+</div>
+
+</div>
+
+{/* 3rd */}
+
+<div className="bg-white rounded-xl shadow p-6 text-center w-52 hover:shadow-lg transition">
+
+<FaTrophy className="text-orange-500 text-2xl mx-auto mb-2"/>
+
+<div className="text-5xl text-orange-500 mb-2">
+<FaUserCircle className="mx-auto"/>
+</div>
+
+<h3 className="font-semibold">
+{top3[2]?.name}
+</h3>
+
+<p className="text-primary font-bold">
+{top3[2]?.score}
 </p>
 
-<div className="flex justify-center items-center gap-1 mt-2 text-accent">
-<FaFire />
-{player.streak} day streak
+<div className="flex justify-center items-center gap-1 text-accent mt-2">
+<FaFire/>
+{top3[2]?.streak}
 </div>
 
 </div>
 
-))}
-
 </div>
 
-{/* 📊 Leaderboard Table */}
+
+{/* ---------------- TABLE ---------------- */}
 
 <div className="bg-white rounded-xl shadow overflow-hidden">
 
@@ -90,13 +135,11 @@ ${player.name === currentUser ? "border-2 border-primary" : ""}
 <thead className="bg-gray-50 border-b text-sm text-gray-600">
 
 <tr>
-
 <th className="px-6 py-3">Rank</th>
 <th className="px-6 py-3">Player</th>
 <th className="px-6 py-3">Score</th>
 <th className="px-6 py-3">Solved</th>
 <th className="px-6 py-3">Streak</th>
-
 </tr>
 
 </thead>
@@ -118,15 +161,24 @@ ${player.name === currentUser ? "bg-blue-50 font-semibold" : ""}
 
 <td className="px-6 py-4">
 
-{rank === 1 ? "🥇" :
- rank === 2 ? "🥈" :
- rank === 3 ? "🥉" :
- rank}
+{rank === 1 ? (
+<FaMedal className="text-yellow-500"/>
+) : rank === 2 ? (
+<FaAward className="text-gray-400"/>
+) : rank === 3 ? (
+<FaTrophy className="text-orange-500"/>
+) : (
+rank
+)}
 
 </td>
 
-<td className="px-6 py-4">
+<td className="px-6 py-4 flex items-center gap-2">
+
+<FaUserCircle className="text-gray-400"/>
+
 {player.name}
+
 </td>
 
 <td className="px-6 py-4 text-primary font-semibold">
@@ -138,10 +190,8 @@ ${player.name === currentUser ? "bg-blue-50 font-semibold" : ""}
 </td>
 
 <td className="px-6 py-4 flex items-center gap-1 text-accent">
-
-<FaFire />
+<FaFire/>
 {player.streak}
-
 </td>
 
 </tr>
@@ -156,7 +206,8 @@ ${player.name === currentUser ? "bg-blue-50 font-semibold" : ""}
 
 </div>
 
-{/* 📊 Pagination */}
+
+{/* ---------------- PAGINATION ---------------- */}
 
 <div className="flex justify-center items-center gap-4 mt-6">
 

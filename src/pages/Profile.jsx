@@ -1,246 +1,502 @@
+import { motion, AnimatePresence } from "framer-motion";
+import {
+User,
+Mail,
+Shield,
+MapPin,
+Calendar,
+Edit2,
+Camera,
+Zap,
+Award,
+X
+} from "lucide-react";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
-  FaUser,
-  FaFire,
-  FaTrophy,
-  FaPuzzlePiece,
-  FaMoon,
-  FaBell,
-  FaRedo,
-  FaSignOutAlt,
-  FaSignInAlt,
-  FaUserPlus
-} from "react-icons/fa";
-import { Link } from "react-router-dom";
+LineChart,
+Line,
+ResponsiveContainer,
+Tooltip
+} from "recharts";
+
+/* -------------------------
+Achievements
+-------------------------- */
+
+const achievements = [
+{ name: "Early Bird", date: "Mar 10, 2026", icon: "🌅", color: "bg-amber-50 text-amber-600" },
+{ name: "Streak Master", date: "Mar 05, 2026", icon: "🔥", color: "bg-rose-50 text-rose-600" },
+{ name: "Logic Ninja", date: "Feb 28, 2026", icon: "🥷", color: "bg-slate-50 text-slate-600" },
+{ name: "Speedster", date: "Feb 15, 2026", icon: "⚡", color: "bg-indigo-50 text-indigo-600" },
+];
+
+/* -------------------------
+Streak Graph Data
+-------------------------- */
+
+const graphData = [
+{ day: "Mon", value: 1 },
+{ day: "Tue", value: 2 },
+{ day: "Wed", value: 3 },
+{ day: "Thu", value: 2 },
+{ day: "Fri", value: 4 },
+{ day: "Sat", value: 5 },
+{ day: "Sun", value: 6 }
+];
 
 export default function Profile() {
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const guest = localStorage.getItem("guest");
+const user = JSON.parse(localStorage.getItem("user"));
+const guest = localStorage.getItem("guest");
 
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+const [editOpen,setEditOpen] = useState(false);
+const [name,setName] = useState(user?.name || "");
+const [showAchievement,setShowAchievement] = useState(false);
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("guest");
-    window.location.href = "/";
-  };
+/* -------------------------
+Guest / Login Check
+-------------------------- */
 
-  const continueGuest = () => {
-    localStorage.setItem("guest", "true");
-    window.location.reload();
-  };
+if (!user && !guest) {
 
-  return (
+return (
 
-    <div>
+<div className="p-10 text-center">
 
-      <h1 className="text-2xl font-semibold mb-6">
-        Profile
-      </h1>
+<h2 className="text-2xl font-bold mb-4">
+Sign in to view your profile
+</h2>
 
-      {/* =========================
-         GUEST MODE
-      ========================= */}
+<div className="flex justify-center gap-4">
 
-      {!user && !guest && (
+<Link to="/login">
+<button className="bg-primary text-white px-6 py-2 rounded-lg">
+Login
+</button>
+</Link>
 
-        <div className="bg-white p-10 rounded-xl shadow text-center">
+<Link to="/signup">
+<button className="border border-primary text-primary px-6 py-2 rounded-lg">
+Sign Up
+</button>
+</Link>
 
-          <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto text-xl mb-4">
-            <FaUser />
-          </div>
+<button
+onClick={()=>{
+localStorage.setItem("guest","true");
+window.location.reload();
+}}
+className="text-gray-600"
+>
+Continue as Guest
+</button>
 
-          <h2 className="text-lg font-semibold mb-2">
-            Continue Your Puzzle Journey
-          </h2>
+</div>
 
-          <p className="text-gray-500 mb-6">
-            Login or sign up to sync your puzzle progress across devices.
-          </p>
+</div>
 
-          <div className="flex justify-center gap-4">
+);
 
-            <Link to="/login">
-              <button className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                <FaSignInAlt />
-                Login
-              </button>
-            </Link>
+}
 
-            <Link to="/signup">
-              <button className="flex items-center gap-2 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white">
-                <FaUserPlus />
-                Sign Up
-              </button>
-            </Link>
+/* -------------------------
+Save Username
+-------------------------- */
 
-            <button
-              onClick={continueGuest}
-              className="text-gray-600 hover:text-primary"
-            >
-              Continue as Guest
-            </button>
+const saveName = () => {
 
-          </div>
+localStorage.setItem("user",JSON.stringify({name}));
 
-        </div>
+setEditOpen(false);
 
-      )}
+window.location.reload();
 
-      {/* =========================
-         USER / GUEST PROFILE
-      ========================= */}
+};
 
-      {(user || guest) && (
+/* -------------------------
+Main UI
+-------------------------- */
 
-        <>
+return (
 
-          {/* Profile Header */}
+<motion.div
+initial={{opacity:0,y:20}}
+animate={{opacity:1,y:0}}
+className="p-8 space-y-8"
+>
 
-          <div className="bg-white p-6 rounded-xl shadow flex items-center gap-4 mb-8">
+<div className="flex flex-col lg:flex-row gap-8">
 
-            <div className="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center text-lg">
-              <FaUser />
-            </div>
+{/* PROFILE COLUMN */}
 
-            <div>
+<div className="lg:w-1/3 space-y-6">
 
-              <h2 className="font-semibold text-lg">
-                {user?.name || "Guest Player"}
-              </h2>
+{/* Profile Card */}
 
-              <p className="text-sm text-gray-500">
-                Logic Puzzle Player
-              </p>
+<div className="bg-white rounded-3xl border shadow-sm overflow-hidden">
 
-            </div>
+<div className="h-32 bg-gradient-to-r from-primary to-indigo-500"></div>
 
-          </div>
+<div className="px-6 pb-6">
 
-          {/* Stats */}
+<div className="relative -mt-16 mb-4">
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div className="w-32 h-32 rounded-3xl border-4 border-white bg-slate-100 overflow-hidden shadow-lg">
 
-            <div className="bg-white p-6 rounded-xl shadow">
+<img
+src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"
+alt="avatar"
+className="w-full h-full"
+/>
 
-              <div className="flex items-center gap-2 text-accent text-sm">
-                <FaFire />
-                Current Streak
-              </div>
+</div>
 
-              <p className="text-2xl font-bold mt-2 text-accent">
-                12
-              </p>
+<button className="absolute bottom-0 right-0 p-2 bg-white rounded-xl border shadow-sm">
+<Camera size={16}/>
+</button>
 
-            </div>
+</div>
 
-            <div className="bg-white p-6 rounded-xl shadow">
+<h2 className="text-2xl font-bold text-slate-900">
+{user?.name || "Guest Player"}
+</h2>
 
-              <div className="flex items-center gap-2 text-primary text-sm">
-                <FaPuzzlePiece />
-                Puzzles Solved
-              </div>
+<p className="text-slate-500">
+Logic Puzzle Player
+</p>
 
-              <p className="text-2xl font-bold mt-2 text-primary">
-                58
-              </p>
+<div className="mt-6 space-y-3 text-sm text-gray-600">
 
-            </div>
+<div className="flex items-center gap-3">
+<MapPin size={16}/>
+India
+</div>
 
-            <div className="bg-white p-6 rounded-xl shadow">
+<div className="flex items-center gap-3">
+<Calendar size={16}/>
+Joined 2026
+</div>
 
-              <div className="flex items-center gap-2 text-yellow-500 text-sm">
-                <FaTrophy />
-                Achievements
-              </div>
+</div>
 
-              <p className="text-2xl font-bold mt-2 text-yellow-500">
-                6
-              </p>
+<button
+onClick={()=>setEditOpen(true)}
+className="w-full mt-6 bg-slate-900 text-white py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+>
+<Edit2 size={18}/>
+Edit Profile
+</button>
 
-            </div>
+</div>
 
-          </div>
+</div>
 
-          {/* Settings */}
+{/* Stats */}
 
-          <div className="bg-white p-6 rounded-xl shadow space-y-4">
+<div className="bg-white rounded-3xl border p-6 shadow-sm">
 
-            <h3 className="font-semibold">
-              Account Settings
-            </h3>
+<h3 className="font-bold mb-4">
+Performance Stats
+</h3>
 
-            <div className="flex justify-between items-center">
+<div className="grid grid-cols-2 gap-4">
 
-              <div className="flex items-center gap-2 text-gray-600">
-                <FaMoon />
-                Theme Mode
-              </div>
+<div className="p-4 rounded-xl bg-gray-50">
+<p className="text-xs text-gray-400">Rank</p>
+<p className="text-xl font-bold">#1242</p>
+</div>
 
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="bg-gray-200 px-4 py-1 rounded-full text-sm"
-              >
-                {darkMode ? "Dark" : "Light"}
-              </button>
+<div className="p-4 rounded-xl bg-gray-50">
+<p className="text-xs text-gray-400">Points</p>
+<p className="text-xl font-bold">12,450</p>
+</div>
 
-            </div>
+</div>
 
-            <div className="flex justify-between items-center">
+<div className="mt-6">
 
-              <div className="flex items-center gap-2 text-gray-600">
-                <FaBell />
-                Notifications
-              </div>
+<div className="flex justify-between text-sm mb-2">
+<span>Level Progress</span>
+<span>75%</span>
+</div>
 
-              <button
-                onClick={() => setNotifications(!notifications)}
-                className="bg-gray-200 px-4 py-1 rounded-full text-sm"
-              >
-                {notifications ? "On" : "Off"}
-              </button>
+<div className="h-2 bg-gray-100 rounded-full overflow-hidden">
 
-            </div>
+<div className="h-full bg-primary w-3/4 rounded-full"></div>
 
-            <div className="flex justify-between items-center text-red-500">
+</div>
 
-              <div className="flex items-center gap-2">
-                <FaRedo />
-                Reset Progress
-              </div>
+</div>
 
-              <button className="hover:underline">
-                Reset
-              </button>
+</div>
 
-            </div>
+{/* STREAK GRAPH */}
 
-            <div className="flex justify-between items-center text-gray-600">
+<div className="bg-white rounded-3xl border p-6 shadow-sm">
 
-              <div className="flex items-center gap-2">
-                <FaSignOutAlt />
-                Logout
-              </div>
+<h3 className="font-bold mb-4">
+Puzzle Streak
+</h3>
 
-              <button
-                onClick={logout}
-                className="hover:underline"
-              >
-                Logout
-              </button>
+<div className="h-40">
 
-            </div>
+<ResponsiveContainer width="100%" height="100%">
 
-          </div>
+<LineChart data={graphData}>
 
-        </>
+<Tooltip />
 
-      )}
+<Line
+type="monotone"
+dataKey="value"
+stroke="#414BEA"
+strokeWidth={3}
+dot={{r:4}}
+/>
 
-    </div>
+</LineChart>
 
-  );
+</ResponsiveContainer>
 
+</div>
+
+</div>
+
+</div>
+
+{/* RIGHT CONTENT */}
+
+<div className="lg:w-2/3 space-y-8">
+
+{/* Achievements */}
+
+<div className="bg-white rounded-3xl border p-8 shadow-sm">
+
+<div className="flex justify-between mb-6">
+
+<h3 className="text-xl font-bold">
+Recent Achievements
+</h3>
+
+<button
+onClick={()=>setShowAchievement(true)}
+className="text-primary text-sm"
+>
+Show Popup
+</button>
+
+</div>
+
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+{achievements.map((ach,i)=>(
+
+<div
+key={i}
+className="flex items-center gap-4 p-4 rounded-xl bg-gray-50"
+>
+
+<div className={`w-12 h-12 flex items-center justify-center rounded-xl ${ach.color}`}>
+{ach.icon}
+</div>
+
+<div>
+
+<p className="font-bold">
+{ach.name}
+</p>
+
+<p className="text-xs text-gray-500">
+Unlocked on {ach.date}
+</p>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+{/* Account Info */}
+
+<div className="bg-white rounded-3xl border p-8 shadow-sm">
+
+<h3 className="text-xl font-bold mb-6">
+Account Information
+</h3>
+
+<div className="space-y-6">
+
+<div className="flex justify-between">
+
+<div className="flex gap-4">
+
+<Mail size={20}/>
+
+<div>
+<p className="font-semibold">Email</p>
+<p className="text-sm text-gray-500">
+user@example.com
+</p>
+</div>
+
+</div>
+
+<button className="text-primary">
+Change
+</button>
+
+</div>
+
+<div className="flex justify-between">
+
+<div className="flex gap-4">
+
+<Shield size={20}/>
+
+<div>
+<p className="font-semibold">Password</p>
+<p className="text-sm text-gray-500">
+••••••••
+</p>
+</div>
+
+</div>
+
+<button className="text-primary">
+Update
+</button>
+
+</div>
+
+<div className="flex justify-between">
+
+<div className="flex gap-4">
+
+<Zap size={20}/>
+
+<div>
+<p className="font-semibold">
+Subscription
+</p>
+<p className="text-sm text-gray-500">
+Free Plan
+</p>
+</div>
+
+</div>
+
+<button className="text-primary">
+Upgrade
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{/* -------------------------
+Edit Modal
+-------------------------- */}
+
+<AnimatePresence>
+
+{editOpen && (
+
+<motion.div
+initial={{opacity:0}}
+animate={{opacity:1}}
+exit={{opacity:0}}
+className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
+>
+
+<motion.div
+initial={{scale:0.9}}
+animate={{scale:1}}
+exit={{scale:0.9}}
+className="bg-white p-6 rounded-2xl w-80 shadow-xl"
+>
+
+<div className="flex justify-between mb-4">
+
+<h3 className="font-bold">
+Edit Username
+</h3>
+
+<button onClick={()=>setEditOpen(false)}>
+<X size={18}/>
+</button>
+
+</div>
+
+<input
+value={name}
+onChange={(e)=>setName(e.target.value)}
+className="border p-2 w-full rounded-lg mb-4"
+/>
+
+<button
+onClick={saveName}
+className="bg-primary text-white px-4 py-2 rounded-lg w-full"
+>
+Save
+</button>
+
+</motion.div>
+
+</motion.div>
+
+)}
+
+</AnimatePresence>
+
+{/* -------------------------
+Achievement Popup
+-------------------------- */}
+
+<AnimatePresence>
+
+{showAchievement && (
+
+<motion.div
+initial={{y:40,opacity:0}}
+animate={{y:0,opacity:1}}
+exit={{opacity:0}}
+className="fixed bottom-8 right-8 bg-white p-4 border rounded-xl shadow-lg flex gap-3"
+>
+
+<div className="bg-yellow-50 text-yellow-500 p-2 rounded-lg">
+<Award size={20}/>
+</div>
+
+<div>
+
+<p className="font-semibold">
+Achievement Unlocked
+</p>
+
+<p className="text-sm text-gray-500">
+Streak Master
+</p>
+
+</div>
+
+</motion.div>
+
+)}
+
+</AnimatePresence>
+
+</motion.div>
+
+);
 }
