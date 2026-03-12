@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Daily Puzzle Test</title>
+<link rel="icon" href="data:,">
+</head>
+
+<body>
+
+<h1>Daily Puzzle</h1>
+
+<div id="puzzle"></div>
+
+<br>
+
+<input id="answer" placeholder="Enter Answer"/>
+
+<button onclick="checkAnswer()">Submit</button>
+
+<button onclick="showHint()">Hint</button>
+
+<p id="hint"></p>
+
+<p id="result"></p>
+
+<script type="module">
+
+import { generateDailyPuzzle, validateAnswer } from "./src/utils/puzzleGenerator.js"
+import { startTimer, stopTimer } from "./src/utils/timer.js"
+import { getHint } from "./src/utils/hintSystem.js"
+import { saveProgress } from "./src/utils/progressDB.js"
+import { calculateScore } from "./src/utils/scoreSystem.js"
+
+const puzzle = await generateDailyPuzzle()
+let hintsUsed = 0
+window.puzzle = puzzle
+window.validateAnswer = validateAnswer
+window.calculateScore = calculateScore
+
+document.getElementById("puzzle").innerText =
+"Puzzle: " + JSON.stringify(puzzle.question)
+
+startTimer()
+
+window.checkAnswer = async function(){
+
+const userAnswer = document.getElementById("answer").value
+
+const correct = validateAnswer(userAnswer, puzzle)
+
+if(correct){
+
+const timeTaken = stopTimer()
+
+// score calculate
+const score = calculateScore(timeTaken, hintsUsed)
+
+document.getElementById("result").innerText =
+"✔ Correct! Time: " + timeTaken + "s | Score: " + score
+
+
+if(typeof indexedDB !== "undefined"){
+
+await saveProgress("todayPuzzle",{
+answer:userAnswer,
+solved:true,
+timeTaken:timeTaken,
+score:score
+})
+
+}
+
+}else{
+
+document.getElementById("result").innerText =
+"❌ Wrong answer, try again"
+
+}
+
+}
+
+window.showHint = function(){
+
+const hint = getHint(puzzle)
+hintsUsed++
+document.getElementById("hint").innerText =
+"Hint: " + hint
+
+}
+
+</script>
+
+</body>
+</html>

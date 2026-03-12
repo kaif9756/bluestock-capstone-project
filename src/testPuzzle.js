@@ -1,12 +1,23 @@
-import { generateDailyPuzzle, validateAnswer } from "./puzzleGenerator.js"
-import { startTimer, stopTimer } from "./timer.js"
-import { getHint, resetHints } from "./hintSystem.js"
+import { generateDailyPuzzle, validateAnswer } from "./utils/puzzleGenerator.js"
+import { startTimer, stopTimer } from "./utils/timer.js"
+import { getHint, resetHints } from "./utils/hintSystem.js"
+import { saveProgress, loadProgress } from "./utils/progressDB.js"
 
 const puzzle = generateDailyPuzzle()
 
 console.log("Today's Puzzle:", puzzle.question)
 console.log("Correct Answer:", puzzle.answer)
 
+// load saved progress
+if (typeof indexedDB !== "undefined") {
+
+    const progress = await loadProgress("todayPuzzle")
+
+    if(progress){
+        console.log("Restored Progress:", progress)
+    }
+
+}
 
 // timer start
 startTimer()
@@ -14,10 +25,9 @@ startTimer()
 // random delay (2-7 seconds)
 const delay = Math.floor(Math.random() * 5000) + 2000
 
-setTimeout(() => {
+setTimeout(async () => {
 
     const userAnswer = puzzle.answer
-    // const userAnswer = 999 // wrong answer for testing
 
     const correct = validateAnswer(userAnswer, puzzle)
 
@@ -27,6 +37,18 @@ setTimeout(() => {
 
         console.log("Correct!")
         console.log("Solved in:", timeTaken,"seconds")
+
+        if (typeof indexedDB !== "undefined") {
+
+            await saveProgress("todayPuzzle", {
+                answer: userAnswer,
+                solved: true,
+                timeTaken: timeTaken,
+                hintsUsed: 0
+            })
+
+            console.log("Progress Saved ✔")
+        }
 
     } else {
 
