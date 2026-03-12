@@ -7,14 +7,20 @@ function App() {
 
   // Load data from localStorage
   useEffect(() => {
-    const storedStreak = localStorage.getItem("streak");
-    const storedLongest = localStorage.getItem("longestStreak");
-    const storedSolved = localStorage.getItem("puzzlesSolved");
+  const storedStreak = Number(localStorage.getItem("streak"));
+  const storedLongest = Number(localStorage.getItem("longestStreak"));
+  const storedSolved = Number(localStorage.getItem("puzzlesSolved"));
 
-    if (storedStreak) setStreak(Number(storedStreak));
-    if (storedLongest) setLongestStreak(Number(storedLongest));
-    if (storedSolved) setPuzzlesSolved(Number(storedSolved));
-  }, []);
+  const validStreak = isNaN(storedStreak) || storedStreak < 0 ? 0 : storedStreak;
+  const validLongest = isNaN(storedLongest) || storedLongest < 0 ? 0 : storedLongest;
+  const validSolved = isNaN(storedSolved) || storedSolved < 0 ? 0 : storedSolved;
+
+  setStreak(validStreak);
+  setLongestStreak(validLongest);
+  setPuzzlesSolved(validSolved);
+
+}, []);
+
 
   // Example function to update streak
   const updateStreak = () => {
