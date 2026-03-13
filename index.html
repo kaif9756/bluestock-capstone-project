@@ -30,12 +30,10 @@ import { startTimer, stopTimer } from "./src/utils/timer.js"
 import { getHint } from "./src/utils/hintSystem.js"
 import { saveProgress } from "./src/utils/progressDB.js"
 import { calculateScore } from "./src/utils/scoreSystem.js"
+import { updateStreak } from "./src/utils/streakSystem.js"
 
 const puzzle = await generateDailyPuzzle()
 let hintsUsed = 0
-window.puzzle = puzzle
-window.validateAnswer = validateAnswer
-window.calculateScore = calculateScore
 
 document.getElementById("puzzle").innerText =
 "Puzzle: " + JSON.stringify(puzzle.question)
@@ -52,12 +50,26 @@ if(correct){
 
 const timeTaken = stopTimer()
 
-// score calculate
 const score = calculateScore(timeTaken, hintsUsed)
 
 document.getElementById("result").innerText =
 "✔ Correct! Time: " + timeTaken + "s | Score: " + score
 
+// progress load
+let progress = JSON.parse(localStorage.getItem("progress")) || {
+currentStreak:0,
+longestStreak:0,
+puzzlesSolved:0,
+lastSolvedDate:null
+}
+
+// update streak
+progress = updateStreak(progress)
+
+// save
+localStorage.setItem("progress", JSON.stringify(progress))
+
+console.log(progress)
 
 if(typeof indexedDB !== "undefined"){
 
@@ -83,6 +95,7 @@ window.showHint = function(){
 
 const hint = getHint(puzzle)
 hintsUsed++
+
 document.getElementById("hint").innerText =
 "Hint: " + hint
 
@@ -91,17 +104,4 @@ document.getElementById("hint").innerText =
 </script>
 
 </body>
-</html>
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>bluestock-capstone-project</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
 </html>
