@@ -1,101 +1,42 @@
-import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { syncActivities } from "./utils/sync";
 
-const MAX_STREAK = 365;
+import Home from "./pages/Home";
+import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Layout from "./components/layout/Layout";
+import Dashboard from "./pages/Dashboard";
+import Puzzle from "./pages/Puzzle";
+import Heatmap from "./pages/Heatmap";
+import Leaderboard from "./pages/Leaderboard";
+import Profile from "./pages/Profile";
 
 function App() {
-  const [streak, setStreak] = useState(0);
-  const [longestStreak, setLongestStreak] = useState(0);
-  const [puzzlesSolved, setPuzzlesSolved] = useState(0);
-  const [lastSolvedDate, setLastSolvedDate] = useState(null);
-  const [canSolveToday, setCanSolveToday] = useState(true);
 
-  // Load saved data
   useEffect(() => {
-    const storedStreak = Number(localStorage.getItem("streak"));
-    const storedLongest = Number(localStorage.getItem("longestStreak"));
-    const storedSolved = Number(localStorage.getItem("puzzlesSolved"));
-    const storedLastDate = localStorage.getItem("lastSolvedDate");
+    window.addEventListener("online", syncActivities);
 
-    const validStreak =
-      isNaN(storedStreak) || storedStreak < 0
-        ? 0
-        : Math.min(storedStreak, MAX_STREAK);
-
-    const validLongest =
-      isNaN(storedLongest) || storedLongest < 0
-        ? 0
-        : Math.min(storedLongest, MAX_STREAK);
-
-    const validSolved =
-      isNaN(storedSolved) || storedSolved < 0 ? 0 : storedSolved;
-
-    setStreak(validStreak);
-    setLongestStreak(validLongest);
-    setPuzzlesSolved(validSolved);
-    setLastSolvedDate(storedLastDate);
-
-    const today = new Date().toDateString();
-
-    if (storedLastDate === today) {
-      setCanSolveToday(false);
-    }
+    return () => {
+      window.removeEventListener("online", syncActivities);
+    };
   }, []);
 
-  const updateStreak = () => {
-    const today = new Date().toDateString();
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
-
-    let newStreak = streak;
-
-    if (lastSolvedDate === today) {
-      alert("You already solved today's puzzle!");
-      return;
-    }
-
-    if (lastSolvedDate === yesterdayStr) {
-      newStreak = streak + 1;
-    } else {
-      newStreak = 1;
-    }
-
-    if (newStreak > MAX_STREAK) {
-      newStreak = MAX_STREAK;
-    }
-
-    const newSolved = puzzlesSolved + 1;
-
-    setStreak(newStreak);
-    setPuzzlesSolved(newSolved);
-    setLastSolvedDate(today);
-    setCanSolveToday(false);
-
-    localStorage.setItem("streak", newStreak);
-    localStorage.setItem("puzzlesSolved", newSolved);
-    localStorage.setItem("lastSolvedDate", today);
-
-    if (newStreak > longestStreak) {
-      setLongestStreak(newStreak);
-      localStorage.setItem("longestStreak", newStreak);
-    }
-  };
-
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>Logic Looper Dashboard</h1>
-
-      <h2>🔥 Current Streak: {streak}</h2>
-      <h3>🏆 Longest Streak: {longestStreak}</h3>
-      <h3>🧩 Puzzles Solved: {puzzlesSolved}</h3>
-
-      {canSolveToday ? (
-        <button onClick={updateStreak}>Solve Today's Puzzle</button>
-      ) : (
-        <p>✅ You already solved today's puzzle</p>
-      )}
-    </div>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/puzzle" element={<Puzzle />} />
+        <Route path="/heatmap" element={<Heatmap />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </Layout>
   );
 }
 
