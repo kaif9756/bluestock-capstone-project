@@ -13,42 +13,57 @@ export default function HeatmapContainer() {
 
   useEffect(() => {
 
-    const loadData = async () => {
+    async function loadData() {
 
-      const data = await getAllActivity();
+      try {
 
-      const map = {};
+        const data = await getAllActivity();
 
-      data.forEach((a) => {
-        map[a.date] = a;
-      });
+        const map = {};
 
-      setActivities(map);
-      setLoading(false);
+        data?.forEach((a) => {
+          map[a.date] = a;
+        });
 
-    };
+        setActivities(map);
+
+      } catch (error) {
+
+        console.error("Heatmap loading error:", error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    }
 
     loadData();
 
   }, []);
 
 
+  /* -----------------------------
+     USER STATS CALCULATION
+  ------------------------------*/
+
   const stats = useMemo(() => {
 
-    const dataList = Object.values(activities);
+    const dataList = Object.values(activities || {});
 
-    const solvedCount = dataList.filter(a => a.solved).length;
+    const solvedCount = dataList.filter(a => a?.solved).length;
 
     let streak = 0;
     let current = dayjs();
 
-    while (activities[current.format("YYYY-MM-DD")]?.solved) {
+    while (activities?.[current.format("YYYY-MM-DD")]?.solved) {
       streak++;
       current = current.subtract(1, "day");
     }
 
     const bestScore = dataList.length
-      ? Math.max(...dataList.map(a => a.score || 0))
+      ? Math.max(...dataList.map(a => a?.score || 0))
       : 0;
 
     return { solvedCount, streak, bestScore };
@@ -57,7 +72,7 @@ export default function HeatmapContainer() {
 
 
   /* -----------------------------
-     SKELETON LOADER (NO FLICKER)
+     SKELETON LOADER
   ------------------------------*/
 
   if (loading) {
@@ -66,19 +81,15 @@ export default function HeatmapContainer() {
 
       <div className="space-y-8">
 
-        {/* Stats Skeleton */}
-
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-          <Skeleton className="h-24 rounded-3xl" />
-          <Skeleton className="h-24 rounded-3xl" />
-          <Skeleton className="h-24 rounded-3xl" />
+          <Skeleton className="h-24 rounded-3xl"/>
+          <Skeleton className="h-24 rounded-3xl"/>
+          <Skeleton className="h-24 rounded-3xl"/>
 
         </div>
 
-        {/* Heatmap Skeleton */}
-
-        <Skeleton className="h-64 rounded-3xl w-full" />
+        <Skeleton className="h-64 rounded-3xl w-full"/>
 
       </div>
 
@@ -87,17 +98,24 @@ export default function HeatmapContainer() {
   }
 
 
+  /* -----------------------------
+     MAIN HEATMAP UI
+  ------------------------------*/
+
   return (
 
     <motion.div
-      initial={{ opacity:0, y:10 }}
-      animate={{ opacity:1, y:0 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
       className="space-y-8"
     >
 
-      {/* Stats Header */}
+      {/* Stats Cards */}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        {/* Current Streak */}
 
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
 
@@ -128,6 +146,8 @@ export default function HeatmapContainer() {
         </div>
 
 
+        {/* Total Solved */}
+
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
 
           <div className="flex items-center gap-3 mb-4">
@@ -156,6 +176,8 @@ export default function HeatmapContainer() {
 
         </div>
 
+
+        {/* Best Score */}
 
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
 
@@ -219,9 +241,11 @@ export default function HeatmapContainer() {
         </div>
 
 
-        <div className="overflow-x-auto pb-4">
+        {/* Heatmap Grid */}
 
-          <HeatmapGrid activityData={activities}/>
+        <div className="overflow-x-auto pb-4 scrollbar-hide">
+
+          <HeatmapGrid activityData={activities} />
 
         </div>
 

@@ -17,28 +17,34 @@ export default function HeatmapCell({ level, date }) {
   ];
 
   return (
+
     <div
       className="relative"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
 
-      {/* Heatmap cell */}
       <motion.div
         className={`w-[14px] h-[14px] rounded-sm ${colors[level]} 
         ${date === today ? "ring-2 ring-primary" : ""}`}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.25 }}
+        whileHover={{ scale: 1.15 }}
+        transition={{ duration: 0.2 }}
       />
 
-      {/* Tooltip */}
       {hover && (
-        <div className="absolute z-10 bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg">
-          {date}
+
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+
+          {dayjs(date).format("MMM D, YYYY")}
+
         </div>
+
       )}
 
     </div>
+
   );
+
 }

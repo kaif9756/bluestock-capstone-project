@@ -23,29 +23,35 @@ export default function HeatmapGrid() {
       });
 
       setActivity(map);
+
     }
 
     loadActivity();
 
   }, []);
 
+
   const days = [];
   let date = startOfYear.startOf("week");
 
-  // include last day of year
   while (date.isBefore(endOfYear) || date.isSame(endOfYear, "day")) {
     days.push(date);
     date = date.add(1, "day");
   }
 
+
   const weeks = [];
 
   for (let i = 0; i < days.length; i += 7) {
+
     const week = days.slice(i, i + 7);
+
     if (week.length === 7) {
       weeks.push(week);
     }
+
   }
+
 
   const monthLabels = [];
 
@@ -54,42 +60,56 @@ export default function HeatmapGrid() {
     const firstDay = week.find(d => d.date() === 1);
 
     if (firstDay) {
+
       monthLabels.push({
         label: firstDay.format("MMM"),
         index
       });
+
     }
 
   });
 
+
   return (
-    <div className="overflow-x-auto max-w-4xl">
+
+    <div className="w-full overflow-x-auto">
+
+      {/* Month Labels */}
 
       <div className="relative ml-12 mb-3 h-4 text-xs text-gray-500">
 
         {monthLabels.map((m, i) => (
+
           <span
             key={i}
             className="absolute"
-            style={{ left: `${m.index * 17}px` }}
+            style={{ left: `${m.index * 18}px` }}
           >
             {m.label}
           </span>
+
         ))}
 
       </div>
 
+
       <div className="flex">
+
+        {/* Day Labels */}
 
         <div className="flex flex-col text-xs text-gray-500 mr-2">
 
-        <span className="h-[16px] leading-[16px]">Mon</span>
-        <span className="h-[16px]"></span>
-        <span className="h-[16px] leading-[16px]">Wed</span>
-        <span className="h-[16px]"></span>
-        <span className="h-[16px] leading-[16px]">Fri</span>
+          <span className="h-[16px] leading-[16px]">Mon</span>
+          <span className="h-[16px]"></span>
+          <span className="h-[16px] leading-[16px]">Wed</span>
+          <span className="h-[16px]"></span>
+          <span className="h-[16px] leading-[16px]">Fri</span>
 
         </div>
+
+
+        {/* Grid */}
 
         <div className="flex gap-[3px]">
 
@@ -114,11 +134,13 @@ export default function HeatmapGrid() {
                 }
 
                 return (
+
                   <HeatmapCell
                     key={dateStr}
                     date={dateStr}
                     level={level}
                   />
+
                 );
 
               })}
@@ -132,5 +154,7 @@ export default function HeatmapGrid() {
       </div>
 
     </div>
+
   );
+
 }
