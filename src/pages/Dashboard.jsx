@@ -5,6 +5,9 @@ import HeatmapPreview from "../components/heatmap/HeatmapPreview";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { getAllActivity } from "../utils/db";
+import DashboardSkeleton from "../components/ui/DashboardSkeleton";
+import ProfileSkeleton from "../components/ui/ProfileSkeleton";
+import LeaderboardSkeleton from "../components/ui/LeaderboardSkeleton";
 
 export default function Dashboard() {
 
@@ -72,6 +75,28 @@ export default function Dashboard() {
     loadStats();
 
   }, []);
+
+  const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 600);
+
+    }, []);
+
+    if (loading) {
+      return <DashboardSkeleton />;
+    }
+
+    if(loading){
+      return <ProfileSkeleton/>
+    }
+
+        if(loading){
+      return <LeaderboardSkeleton/>
+    }
 
   return (
     <div>

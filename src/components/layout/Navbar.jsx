@@ -45,7 +45,7 @@ export default function Navbar() {
         <div className="flex items-center gap-8 text-gray-800 font-semibold text-[16px]">
 
           <NavLink
-            to="/"
+            to="/Dashboard"
             className={({ isActive }) =>
               isActive
                 ? "text-primary"

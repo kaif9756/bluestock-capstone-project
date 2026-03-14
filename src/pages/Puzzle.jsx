@@ -1,134 +1,228 @@
-import { useState, useEffect } from "react";
-import dayjs from "dayjs";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { Trophy, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { saveActivity } from "../utils/db";
-import { FaClock, FaLightbulb, FaRedo, FaCheckCircle } from "react-icons/fa";
+
+const PUZZLE_SEQUENCE = [1, 3, 6, 10, 15];
+const OPTIONS = [18, 20, 21, 24, 25];
 
 export default function Puzzle() {
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedTile, setSelectedTile] = useState(null);
-  const [time, setTime] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const [isSolved, setIsSolved] = useState(false);
 
-  useEffect(() => {
+  const navigate = useNavigate();
 
-    const interval = setInterval(() => {
-      setTime(prev => prev + 1);
-    }, 1000);
+  const handleCheck = async (val) => {
 
-    return () => clearInterval(interval);
+    setSelected(val);
 
-  }, []);
+    if (val === 21) {
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
-  };
+      setStatus("correct");
+      setIsSolved(true);
 
-  const handlePuzzleComplete = async () => {
+      await saveActivity({
+        date: new Date().toISOString().split("T")[0],
+        solved: true,
+        score: 150,
+        timeTaken: 45,
+        difficulty: 2
+      });
 
-    const today = dayjs().format("YYYY-MM-DD");
+    } else {
 
-    await saveActivity({
-      date: today,
-      solved: true,
-      score: 120,
-      timeTaken: time,
-      difficulty: 2
-    });
+      setStatus("wrong");
 
-    setShowModal(true);
+      setTimeout(() => {
+        setStatus("idle");
+        setSelected(null);
+      }, 1000);
+
+    }
+
   };
 
   return (
-    <div>
 
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-6 bg-slate-50">
 
-        <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-600 font-medium">
-          Medium
-        </span>
+      <motion.div
+        initial={{ opacity:0, scale:0.9 }}
+        animate={{ opacity:1, scale:1 }}
+        className="max-w-2xl w-full bg-white rounded-[40px] shadow-xl border p-12 relative overflow-hidden"
+      >
 
-        <div className="flex items-center gap-2 text-gray-600 font-medium">
-          <FaClock />
-          <span>{formatTime(time)}</span>
-        </div>
+        {/* Header */}
 
-      </div>
+        <header className="text-center mb-12">
 
-      <div className="bg-white p-8 rounded-xl shadow mb-6">
+          <span className="px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-wider">
+            Logic Challenge
+          </span>
 
-        <div className="grid grid-cols-5 gap-4 max-w-md mx-auto">
+          <h1 className="text-3xl font-black text-slate-900 mt-4">
+            Complete the Sequence
+          </h1>
 
-          {[...Array(25)].map((_, index) => (
+          <p className="text-slate-500 mt-2">
+            Identify the pattern and find the next number.
+          </p>
+
+        </header>
+
+
+        {/* Sequence */}
+
+        <div className="flex justify-center items-center gap-4 mb-16">
+
+          {PUZZLE_SEQUENCE.map((num, i) => (
 
             <div
-              key={index}
-              onClick={() => setSelectedTile(index)}
-              className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center text-lg font-semibold cursor-pointer
-              transition duration-200 transform hover:scale-105
-              ${
-                selectedTile === index
-                  ? "border-primary bg-blue-100"
-                  : "border-gray-200 hover:border-primary hover:bg-blue-50"
-              }`}
+              key={i}
+              className="w-16 h-16 rounded-xl bg-slate-50 border flex items-center justify-center text-xl font-bold text-slate-400"
             >
-              ?
+              {num}
             </div>
+
+          ))}
+
+          <motion.div
+            animate={status === "correct" ? { scale:[1,1.1,1] } : {}}
+            className="w-16 h-16 rounded-xl bg-indigo-50 border-2 border-dashed border-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-600"
+          >
+            ?
+          </motion.div>
+
+        </div>
+
+
+        {/* Options */}
+
+        <div className="grid grid-cols-5 gap-4">
+
+          {OPTIONS.map((opt) => (
+
+            <motion.button
+              key={opt}
+              whileHover={{ y:-4 }}
+              whileTap={{ scale:0.95 }}
+              onClick={() => !isSolved && handleCheck(opt)}
+              disabled={isSolved}
+              className={`h-16 rounded-xl font-bold text-lg transition border-2
+              
+              ${
+                selected === opt
+                ? status === "correct"
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "bg-rose-500 border-rose-500 text-white"
+                : "bg-white border-slate-100 text-slate-600 hover:border-indigo-200 hover:bg-indigo-50"
+              }
+
+              `}
+            >
+
+              {opt}
+
+            </motion.button>
 
           ))}
 
         </div>
 
-      </div>
 
-      <div className="flex justify-center gap-4">
+        {/* Success Overlay */}
 
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700 font-medium hover:bg-yellow-200 transition">
-          <FaLightbulb />
-          Hint
-        </button>
+        <AnimatePresence>
 
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition">
-          <FaRedo />
-          Reset
-        </button>
+          {isSolved && (
 
-        <button
-          onClick={handlePuzzleComplete}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-blue-600 transition"
-        >
-          <FaCheckCircle />
-          Submit
-        </button>
-
-      </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-
-          <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-sm">
-
-            <h2 className="text-xl font-semibold mb-4">
-              Puzzle Completed!
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              Great job! Your puzzle has been submitted.
-            </p>
-
-            <button
-              onClick={() => setShowModal(false)}
-              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition"
+            <motion.div
+              initial={{ opacity:0 }}
+              animate={{ opacity:1 }}
+              className="absolute inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-center p-8"
             >
-              Continue
-            </button>
 
-          </div>
+              <motion.div
+                initial={{ scale:0 }}
+                animate={{ scale:1 }}
+                transition={{ type:"spring", damping:12 }}
+                className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center text-white mb-6 shadow-lg"
+              >
+
+                <Trophy size={48}/>
+
+              </motion.div>
+
+              <h2 className="text-4xl font-black text-slate-900 mb-2">
+                Brilliant!
+              </h2>
+
+              <p className="text-slate-500 mb-8 max-w-xs">
+                You solved today's puzzle.
+              </p>
+
+              <button
+                onClick={() => navigate("/")}
+                className="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800"
+              >
+
+                Back to Dashboard
+                <ArrowRight size={20}/>
+
+              </button>
+
+            </motion.div>
+
+          )}
+
+        </AnimatePresence>
+
+
+        {/* Feedback Icons */}
+
+        <div className="absolute top-8 right-8">
+
+          <AnimatePresence mode="wait">
+
+            {status === "correct" && (
+
+              <motion.div
+                key="correct"
+                initial={{ scale:0 }}
+                animate={{ scale:1 }}
+                exit={{ scale:0 }}
+                className="text-emerald-500"
+              >
+                <CheckCircle2 size={32}/>
+              </motion.div>
+
+            )}
+
+            {status === "wrong" && (
+
+              <motion.div
+                key="wrong"
+                initial={{ scale:0 }}
+                animate={{ scale:1 }}
+                exit={{ scale:0 }}
+                className="text-rose-500"
+              >
+                <XCircle size={32}/>
+              </motion.div>
+
+            )}
+
+          </AnimatePresence>
 
         </div>
-      )}
+
+      </motion.div>
 
     </div>
+
   );
+
 }

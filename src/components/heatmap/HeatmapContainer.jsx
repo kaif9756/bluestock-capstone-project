@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Zap, Trophy, Target, Calendar, Info, RefreshCw } from "lucide-react";
+import { Zap, Trophy, Target, Calendar, Info } from "lucide-react";
 import HeatmapGrid from "./HeatmapGrid";
 import { getAllActivity } from "../../utils/db";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
+import Skeleton from "../ui/Skeleton";
 
 export default function HeatmapContainer() {
 
@@ -46,22 +47,45 @@ export default function HeatmapContainer() {
       current = current.subtract(1, "day");
     }
 
-    const bestScore = Math.max(...dataList.map(a => a.score || 0), 0);
+    const bestScore = dataList.length
+      ? Math.max(...dataList.map(a => a.score || 0))
+      : 0;
 
     return { solvedCount, streak, bestScore };
 
   }, [activities]);
 
 
+  /* -----------------------------
+     SKELETON LOADER (NO FLICKER)
+  ------------------------------*/
+
   if (loading) {
 
     return (
-      <div className="w-full h-64 flex items-center justify-center">
-        <RefreshCw className="animate-spin text-primary" size={32} />
+
+      <div className="space-y-8">
+
+        {/* Stats Skeleton */}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+          <Skeleton className="h-24 rounded-3xl" />
+          <Skeleton className="h-24 rounded-3xl" />
+          <Skeleton className="h-24 rounded-3xl" />
+
+        </div>
+
+        {/* Heatmap Skeleton */}
+
+        <Skeleton className="h-64 rounded-3xl w-full" />
+
       </div>
+
     );
 
   }
+
 
   return (
 
@@ -202,6 +226,8 @@ export default function HeatmapContainer() {
         </div>
 
 
+        {/* Legend */}
+
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t border-slate-100">
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -220,15 +246,15 @@ export default function HeatmapContainer() {
               Less
             </span>
 
-                <div className="flex gap-1">
+            <div className="flex gap-1">
 
-                    <div className="w-3 h-3 rounded-sm bg-gray-200"></div>
-                    <div className="w-3 h-3 rounded-sm bg-green-200"></div>
-                    <div className="w-3 h-3 rounded-sm bg-green-400"></div>
-                    <div className="w-3 h-3 rounded-sm bg-green-600"></div>
-                    <div className="w-3 h-3 rounded-sm bg-green-800"></div>
+              <div className="w-3 h-3 rounded-sm bg-gray-200"></div>
+              <div className="w-3 h-3 rounded-sm bg-green-200"></div>
+              <div className="w-3 h-3 rounded-sm bg-green-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-green-600"></div>
+              <div className="w-3 h-3 rounded-sm bg-green-800"></div>
 
-                </div>
+            </div>
 
             <span className="text-[10px] font-bold text-slate-400 uppercase">
               More
@@ -240,8 +266,8 @@ export default function HeatmapContainer() {
 
       </div>
 
-
     </motion.div>
 
   );
+
 }
