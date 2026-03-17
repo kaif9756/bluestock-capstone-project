@@ -1,25 +1,35 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { generateDailyPuzzle, validateAnswer } from "../utils/puzzleGenerator";
+import { useState, useEffect } from "react";
 import { Trophy, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { saveActivity } from "../utils/db";
 
-const PUZZLE_SEQUENCE = [1, 3, 6, 10, 15];
-const OPTIONS = [18, 20, 21, 24, 25];
-
 export default function Puzzle() {
 
-  const [selected, setSelected] = useState(null);
+  const [puzzle, setPuzzle] = useState(null);
+  const [answerInput, setAnswerInput] = useState("");
   const [status, setStatus] = useState("idle");
   const [isSolved, setIsSolved] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleCheck = async (val) => {
+  // load puzzle once
+  useEffect(() => {
+    const loadPuzzle = async () => {
+      const p = await generateDailyPuzzle();
+      setPuzzle(p);
+    };
+    loadPuzzle();
+  }, []);
 
-    setSelected(val);
+  const handleCheck = async () => {
 
-    if (val === 21) {
+    if (!puzzle) return;
+
+    const correct = validateAnswer(answerInput, puzzle);
+
+    if (correct) {
 
       setStatus("correct");
       setIsSolved(true);
@@ -29,7 +39,7 @@ export default function Puzzle() {
         solved: true,
         score: 150,
         timeTaken: 45,
-        difficulty: 2
+        difficulty: puzzle.difficulty
       });
 
     } else {
@@ -38,12 +48,19 @@ export default function Puzzle() {
 
       setTimeout(() => {
         setStatus("idle");
-        setSelected(null);
       }, 1000);
 
     }
 
   };
+
+  if (!puzzle) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading Puzzle...
+      </div>
+    );
+  }
 
   return (
 
@@ -64,71 +81,46 @@ export default function Puzzle() {
           </span>
 
           <h1 className="text-3xl font-black text-slate-900 mt-4">
-            Complete the Sequence
+            Daily Puzzle
           </h1>
 
           <p className="text-slate-500 mt-2">
-            Identify the pattern and find the next number.
+            Solve today's logic challenge.
           </p>
 
         </header>
 
 
-        {/* Sequence */}
+        {/* Puzzle Question */}
 
-        <div className="flex justify-center items-center gap-4 mb-16">
+        <div className="text-center text-xl font-bold mb-10">
 
-          {PUZZLE_SEQUENCE.map((num, i) => (
-
-            <div
-              key={i}
-              className="w-16 h-16 rounded-xl bg-slate-50 border flex items-center justify-center text-xl font-bold text-slate-400"
-            >
-              {num}
-            </div>
-
-          ))}
-
-          <motion.div
-            animate={status === "correct" ? { scale:[1,1.1,1] } : {}}
-            className="w-16 h-16 rounded-xl bg-indigo-50 border-2 border-dashed border-indigo-200 flex items-center justify-center text-xl font-bold text-indigo-600"
-          >
-            ?
-          </motion.div>
+          {Array.isArray(puzzle.question)
+            ? JSON.stringify(puzzle.question)
+            : puzzle.question}
 
         </div>
 
 
-        {/* Options */}
+        {/* Answer Input */}
 
-        <div className="grid grid-cols-5 gap-4">
+        <div className="flex justify-center gap-4 mb-8">
 
-          {OPTIONS.map((opt) => (
+          <input
+            value={answerInput}
+            onChange={(e) => setAnswerInput(e.target.value)}
+            placeholder="Enter Answer"
+            className="border p-3 rounded-lg w-48 text-center"
+            disabled={isSolved}
+          />
 
-            <motion.button
-              key={opt}
-              whileHover={{ y:-4 }}
-              whileTap={{ scale:0.95 }}
-              onClick={() => !isSolved && handleCheck(opt)}
-              disabled={isSolved}
-              className={`h-16 rounded-xl font-bold text-lg transition border-2
-              
-              ${
-                selected === opt
-                ? status === "correct"
-                  ? "bg-emerald-500 border-emerald-500 text-white"
-                  : "bg-rose-500 border-rose-500 text-white"
-                : "bg-white border-slate-100 text-slate-600 hover:border-indigo-200 hover:bg-indigo-50"
-              }
-
-              `}
-            >
-
-              {opt}
-
-            </motion.button>
-
-          ))}
+          <button
+            onClick={handleCheck}
+            className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
+            disabled={isSolved}
+          >
+            Submit
+          </button>
 
         </div>
 
