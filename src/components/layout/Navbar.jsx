@@ -1,89 +1,124 @@
-import { useState, useEffect } from "react";
-import { NavLink, Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
-import NotificationPanel from "../NotificationPanel";
-
-import { Bell, Menu, X } from "lucide-react";
-import { FaUser } from "react-icons/fa";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [openNotifications, setOpenNotifications] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+  const isLoggedIn = localStorage.getItem("user");
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // style for active link
+  const linkStyle = (path) =>
+    location.pathname === path
+      ? "text-blue-600 font-semibold"
+      : "text-gray-700 hover:text-blue-600";
 
-  const navLinkStyle = ({ isActive }) =>
-    isActive
-      ? "text-primary font-semibold"
-      : "hover:text-primary transition";
+  // navigation handler
+  const handleNavigate = (path) => {
+    setOpen(false);
+    navigate(path);
+  };
 
   return (
-    <nav
-      className={`w-full bg-white fixed top-0 left-0 z-50 ${
-        scrolled ? "shadow-md" : ""
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        
+    <header className="fixed top-0 w-full z-50 bg-white shadow-sm">
+      
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="logo" className="h-7 sm:h-8" />
+        <Link to="/" onClick={() => setOpen(false)}>
+          <img
+            src="https://bluestock.in/static/assets/logo/logo.webp"
+            alt="Bluestock"
+            className="h-10"
+          />
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6 text-gray-800 text-sm font-medium">
-          <NavLink to="/Dashboard" className={navLinkStyle}>Dashboard</NavLink>
-          <NavLink to="/puzzle" className={navLinkStyle}>Puzzle</NavLink>
-          <NavLink to="/heatmap" className={navLinkStyle}>Heatmap</NavLink>
-          <NavLink to="/leaderboard" className={navLinkStyle}>Leaderboard</NavLink>
-        </div>
+        <div className="hidden md:flex items-center gap-8 text-sm">
 
-        {/* Right Icons */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          
           <button
-            onClick={() => setOpenNotifications(true)}
-            className="p-2 rounded-lg hover:bg-gray-100"
+            onClick={() => handleNavigate("/dashboard")}
+            className={linkStyle("/dashboard")}
           >
-            <Bell size={18} />
+            Dashboard
           </button>
 
-          <Link to="/profile">
-            <FaUser className="text-gray-600 text-base" />
-          </Link>
-
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => handleNavigate("/puzzle")}
+            className={linkStyle("/puzzle")}
           >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            Puzzle
           </button>
+
+          {isLoggedIn ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem("user");
+                handleNavigate("/");
+              }}
+              className="px-5 py-2 border rounded-lg text-gray-700 hover:bg-gray-100"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => handleNavigate("/login")}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-500"
+            >
+              Login
+            </button>
+          )}
         </div>
+
+        {/* Mobile Toggle */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="md:hidden text-gray-700"
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
 
       {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden px-4 pb-4 flex flex-col gap-3 text-sm font-medium bg-white border-t">
-          <NavLink to="/Dashboard" className={navLinkStyle}>Dashboard</NavLink>
-          <NavLink to="/puzzle" className={navLinkStyle}>Puzzle</NavLink>
-          <NavLink to="/heatmap" className={navLinkStyle}>Heatmap</NavLink>
-          <NavLink to="/leaderboard" className={navLinkStyle}>Leaderboard</NavLink>
+      {open && (
+        <div className="md:hidden bg-white border-t px-4 py-4 space-y-4">
+
+          <button
+            onClick={() => handleNavigate("/dashboard")}
+            className="block w-full text-left"
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() => handleNavigate("/puzzle")}
+            className="block w-full text-left"
+          >
+            Puzzle
+          </button>
+
+          {isLoggedIn ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem("user");
+                handleNavigate("/");
+              }}
+              className="block w-full text-left text-red-500"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => handleNavigate("/login")}
+              className="block w-full text-left text-blue-600"
+            >
+              Login
+            </button>
+          )}
         </div>
       )}
-
-      <NotificationPanel
-        isOpen={openNotifications}
-        onClose={() => setOpenNotifications(false)}
-      />
-    </nav>
+    </header>
   );
 }
