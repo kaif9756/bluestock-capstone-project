@@ -4,17 +4,14 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-lightbg">
 
-      {/* Navbar */}
       <Navbar />
 
-      {/* Main Content */}
-      <main className="flex-grow max-w-6xl mx-auto px-6 pt-24 pb-10 w-full">
+      <main className="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-8">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 border-t border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center text-sm text-gray-600">
+      <footer className="py-4 sm:py-6 border-t bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-xs sm:text-sm text-gray-600">
           © Copyright & Trademark Registered in India{" "}
           <a
             href="https://bluestock.in/"
@@ -24,7 +21,7 @@ export default function Layout({ children }) {
           >
             Bluestock™
           </a>{" "}
-          All Rights Reserved | Fintech Platforms for a Growing India. 🇮🇳
+          All Rights Reserved
         </div>
       </footer>
 

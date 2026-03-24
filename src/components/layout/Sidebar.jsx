@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   return (
-    <div className="w-64 h-screen bg-white border-r p-6 hidden md:block">
+    <div className="w-64 h-screen bg-white border-r p-5 hidden md:flex flex-col">
 
-      <div className="text-lg font-semibold text-primary mb-8">
+      <div className="text-lg font-semibold text-primary mb-6">
         Daily Puzzle
       </div>
 
-      <nav className="flex flex-col gap-4 text-gray-700">
+      <nav className="flex flex-col gap-3 text-gray-700 text-sm">
 
         <Link to="/" className="flex items-center gap-2 hover:text-primary">
           <Home size={18} /> Dashboard
