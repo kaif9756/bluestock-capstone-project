@@ -9,7 +9,10 @@ function App() {
   const [lastSolvedDate, setLastSolvedDate] = useState(null);
   const [canSolveToday, setCanSolveToday] = useState(true);
 
-  // Load saved data
+  const [answer, setAnswer] = useState("");
+  const correctAnswer = "5";
+
+  // Load data
   useEffect(() => {
     const storedStreak = Number(localStorage.getItem("streak"));
     const storedLongest = Number(localStorage.getItem("longestStreak"));
@@ -83,17 +86,75 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>Logic Looper Dashboard</h1>
+    <div
+      style={{
+        maxWidth: "400px",
+        margin: "auto",
+        padding: "20px",
+        textAlign: "center",
+        fontFamily: "Arial",
+      }}
+    >
+      <h1>Logic Looper</h1>
 
-      <h2>🔥 Current Streak: {streak}</h2>
-      <h3>🏆 Longest Streak: {longestStreak}</h3>
-      <h3>🧩 Puzzles Solved: {puzzlesSolved}</h3>
+      <div
+        style={{
+          background: "#f5f5f5",
+          padding: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        <h2>🔥 {streak}</h2>
+        <p>Current Streak</p>
+
+        <h3>🏆 {longestStreak}</h3>
+        <p>Best</p>
+
+        <h3>🧩 {puzzlesSolved}</h3>
+        <p>Solved</p>
+      </div>
+
+      <br />
 
       {canSolveToday ? (
-        <button onClick={updateStreak}>Solve Today's Puzzle</button>
+        <>
+          <p>Solve this puzzle: What is 2 + 3?</p>
+
+          <input
+            type="text"
+            placeholder="Enter answer"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            style={{ padding: "10px", marginTop: "10px" }}
+          />
+
+          <br />
+          <br />
+
+          <button
+            onClick={() => {
+              if (answer === correctAnswer) {
+                updateStreak();
+                alert("Correct Answer!");
+                setAnswer("");
+              } else {
+                alert("Wrong Answer!");
+              }
+            }}
+            style={{
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#4CAF50",
+              color: "white",
+              fontSize: "16px",
+            }}
+          >
+            Submit Answer
+          </button>
+        </>
       ) : (
-        <p>✅ You already solved today's puzzle</p>
+        <p>✅ Come back tomorrow!</p>
       )}
     </div>
   );
